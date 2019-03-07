@@ -16,7 +16,9 @@ DOCUMENTATION = """
         description: full path to the gpg binary
         type: string
         required: False
-        default: gpg located automatically in PATH environment variable
+        default: >
+            /usr/bin/gpg (Ansible < 2.7) or located automatically in PATH
+            environment variable (Ansible >= 2.7).
       homedir:
         description: path to the gnupg home directory (see man 1 gpg)
         type: string
@@ -63,7 +65,6 @@ import subprocess
 
 from ansible.errors import AnsibleError
 from ansible.module_utils._text import to_text
-from ansible.module_utils.common.process import get_bin_path
 from ansible.plugins.lookup import LookupBase
 
 try:
@@ -73,14 +74,23 @@ except ImportError:
     display = Display()
 
 
+try:
+    from ansible.module_utils.common.process import get_bin_path
+    HAS_BINPATH = True
+except ImportError:
+    HAS_BINPATH = False
+
 class LookupModule(LookupBase):
 
     def run(self, uids, variables, **kwargs):
         args = []
 
-        executable = kwargs.get('executable', 'gpg')
-        if '/' not in executable:
-            executable = get_bin_path(executable)
+        if HAS_BINPATH:
+            executable = kwargs.get('executable', 'gpg')
+            if '/' not in executable and HAS_BINPATH:
+                executable = get_bin_path(executable)
+        else:
+            executable = kwargs.get('executable', '/usr/bin/gpg')
 
         args.append(executable)
 
