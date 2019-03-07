@@ -20,6 +20,7 @@ install:
 script:
   - if [ "$ANSIBLE_VERSION" = "latest" ]; then ansible-lint .; fi
   - ansible-playbook -i tests/inventory tests/test.yml --connection=local
+  - if python -c 'import sys; sys.exit(sys.version_info < (3,1))'; then ansible-playbook -i tests/inventory tests/test-py3.yml --connection=local; fi
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

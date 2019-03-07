@@ -61,6 +61,7 @@ RETURN = """
       - exported gpg public key
 """
 
+import codecs
 import subprocess
 
 from ansible.errors import AnsibleError
@@ -73,6 +74,18 @@ except ImportError:
     from ansible.utils.display import Display
     display = Display()
 
+# Ansible to_text function uses the 'surrogateescape' error handler if it is
+# available. This will preserve any binary data until it is encoded / written
+# to disk again. This error handler was introduced in Python 3.1.
+#
+# See also:
+# * https://docs.python.org/3/library/codecs.html?highlight=surrogateescape#codec-base-classes
+# * https://www.python.org/dev/peps/pep-0383/
+try:
+    codecs.lookup_error('surrogateescape')
+    HAS_SURROGATEESCAPE = True
+except LookupError:
+    HAS_SURROGATEESCAPE = False
 
 try:
     from ansible.module_utils.common.process import get_bin_path
@@ -101,6 +114,9 @@ class LookupModule(LookupBase):
         armor = kwargs.get('armor', False)
         if armor is True:
             args.append('--armor')
+
+        if not (HAS_SURROGATEESCAPE or armor):
+            raise AnsibleError("lookup_plugin.gpg_export(%s) binary export is only supported on Python >= 3.1" % (",".join(uids)))
 
         export_options = kwargs.get('export_options', [])
         if len(export_options) > 0:
