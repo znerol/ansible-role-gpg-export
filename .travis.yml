@@ -18,7 +18,7 @@ install:
   - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible-lint; fi
 
 script:
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then ansible-lint; fi
+  - if [ "$ANSIBLE_VERSION" = "latest" ]; then ansible-lint .; fi
   - ansible-playbook -i tests/inventory tests/test.yml --connection=local
 
 notifications:
