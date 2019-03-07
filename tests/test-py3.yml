@@ -24,6 +24,7 @@
         export_kwds:
           homedir: "{{ playbook_dir }}/fixtures/gnupg"
           match: exact_email
+          armor: False
         gpg_key_actual: "{{ lookup('gpg_export', gpg_uid, **export_kwds) }}"
       loop: "{{ gpg_uids | list }}"
       loop_control:

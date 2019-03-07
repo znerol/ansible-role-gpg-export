@@ -27,7 +27,7 @@ DOCUMENTATION = """
         description: produce ASCII armored output (see man 1 gpg)
         type: boolean
         required: False
-        default: False
+        default: True
       export_options:
         description: options for the exported keys (see man 1 gpg)
         type: list
@@ -110,7 +110,7 @@ class LookupModule(LookupBase):
         if homedir is not None:
             args.extend(['--homedir', homedir])
 
-        armor = kwargs.get('armor', False)
+        armor = kwargs.get('armor', True)
         if armor is True:
             args.append('--armor')
 
