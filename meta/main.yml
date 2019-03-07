@@ -1,0 +1,32 @@
+galaxy_info:
+  role_name: gpg_export
+  author: Lorenz Schori
+  description: GnuPG public key lookup plugin
+
+  issue_tracker_url: https://github.com/znerol/ansible-role-gpg-export
+
+  license: MIT
+
+  min_ansible_version: 2.5
+
+  platforms:
+    - name: GenericUNIX
+      versions:
+        - all
+        - any
+    - name: GenericBSD
+      versions:
+        - all
+        - any
+    - name: GenericLinux
+      versions:
+        - all
+        - any
+
+  galaxy_tags:
+    - gpg
+    - lookup
+    - openpgp
+    - pgp
+
+dependencies: []

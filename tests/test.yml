@@ -1,0 +1,52 @@
+---
+- hosts: localhost
+  vars:
+    gpg_uids:
+      - "Joe.Doe@Example.ORG"
+      - "joe.doe@Example.com"
+      - "test-wkd@example.org"
+      - "me@example.com"
+      - "äëöüï@example.org"
+      - "foo@example.com"
+
+  tasks:
+    - name: Role znerol.gpg_export imported
+      import_role:
+        name: ../../ansible-role-gpg-export
+
+    - name: Test gpg_export (binary)
+      vars:
+        fixture_kwds:
+          lstrip: False
+          rstrip: False
+        fixture_path: "{{ '{:s}/fixtures/{:s}.pub'.format(playbook_dir,  gpg_uid) }}"
+        gpg_key_expected: "{{ lookup('file', fixture_path, **fixture_kwds) }}"
+        export_kwds:
+          homedir: "{{ playbook_dir }}/fixtures/gnupg"
+          match: exact_email
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_uid, **export_kwds) }}"
+      loop: "{{ gpg_uids | list }}"
+      loop_control:
+        loop_var: gpg_uid
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected gpg key for uid {{ gpg_uid }}"
+
+    - name: Test gpg_export (armor)
+      vars:
+        fixture_kwds:
+          lstrip: False
+          rstrip: False
+        fixture_path: "{{ '{:s}/fixtures/{:s}.asc'.format(playbook_dir,  gpg_uid) }}"
+        gpg_key_expected: "{{ lookup('file', fixture_path, **fixture_kwds) }}"
+        export_kwds:
+          homedir: "{{ playbook_dir }}/fixtures/gnupg"
+          match: exact_email
+          armor: True
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_uid, **export_kwds) }}"
+      loop: "{{ gpg_uids | list }}"
+      loop_control:
+        loop_var: gpg_uid
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected gpg key for uid {{ gpg_uid }}"
