@@ -119,7 +119,7 @@ class LookupModule(LookupBase):
         export_options = kwargs.get('export_options', [])
         if len(export_options) > 0:
             args.append('--export-options')
-            args.append('.'.join(export_options))
+            args.append(','.join(export_options))
 
         args.extend(['--batch', '--no-tty', '--export'])
 

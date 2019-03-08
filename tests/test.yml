@@ -109,3 +109,29 @@
       fail:
         msg: "Unexpected gpg key for fingerprint {{ gpg_fingerprint }}"
 
+    - name: Test custom executable
+      vars:
+        gpg_uid: fake-uid
+        export_kwds:
+          executable: "{{ playbook_dir }}/mocks/fake-gpg"
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_uid, **export_kwds) }}"
+        gpg_key_expected: |
+            --- FAKEKEY ---
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected fake gpg key for mocked custom executable"
+
+    - name: Test export options
+      vars:
+        gpg_uid: fake-uid
+        export_kwds:
+          executable: "{{ playbook_dir }}/mocks/fake-gpg-export-options"
+          export_options:
+            - export-local-sigs
+            - export-attributes
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_uid, **export_kwds) }}"
+        gpg_key_expected: |
+            --- FAKEKEY WITH LOCAL SIGS AND ATTRIBUTES ---
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected fake gpg key for mocked custom executable"

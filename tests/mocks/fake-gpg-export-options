@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+#
+# A simple mock gpg binary which expects specific command line arguments and
+# prints the string '--- FAKEKEY WITH LOCAL SIGS AND ATTRIBUTES ---' to
+# standard output.
+
+from __future__ import (absolute_import, division, print_function)
+
+import sys
+import unittest
+
+class FakeGPG(unittest.TestCase):
+
+    def test_argv(self):
+        expected = ['--armor', '--export-options', 'export-local-sigs,export-attributes', '--batch', '--no-tty', '--export', 'fake-uid']
+        actual = sys.argv[1:]
+        self.assertEqual(expected, actual)
+        print("--- FAKEKEY WITH LOCAL SIGS AND ATTRIBUTES ---")
+
+if __name__ == '__main__':
+    unittest.main(argv=sys.argv[0:1])
