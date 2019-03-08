@@ -10,10 +10,19 @@ Requirements
 
 [GnuPG][1] installed on controller machine.
 
-Role Variables
---------------
+Optional Lookup Parameters
+--------------------------
 
-None
+* `executable`: Full path to the gpg binary. Defaults to `/usr/bin/gpg`
+  (Ansible < 2.7) or located automatically in `PATH` environment variable
+  (Ansible >= 2.7).
+* `homedir`: Path to the gnupg home directory (see [man 1 gpg][2]). Defaults to
+  GnuPG default (`~/.gnupg`).
+* `armor`: Produce ASCII armored output (see [man 1 gpg][2]). Defaults to `True`.
+* `export_options`: List of options for the exported keys (see [man 1 gpg][2]).
+* `match`: One of `default`, `exact_uid`, `exact_email`, `partial_email`,
+  specifying how keys are matched to the given uids. (see [man 1 gpg][2])
+
 
 Dependencies
 ------------
@@ -28,7 +37,7 @@ Usage of `gpg_export` lookup:
     - hosts: webservers
       tasks:
         - import_role:
-            name: znerol.gpg-export
+            name: znerol.gpg_export
 
         - name: Publish GPG keys on webserver
           loop:
@@ -50,3 +59,4 @@ License
 MIT
 
 [1]: https://www.gnupg.org/
+[2]: https://www.gnupg.org/documentation/manpage.html
