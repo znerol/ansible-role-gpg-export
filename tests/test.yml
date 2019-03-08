@@ -8,6 +8,27 @@
       - "me@example.com"
       - "foo@example.com"
 
+    gpg_exact_uids:
+      - [ "Joe Doe 1 <Joe.Doe@Example.ORG>", "Joe.Doe@Example.ORG" ]
+      - [ "Joe Doe 2 <joe.doe@Example.com>", "joe.doe@Example.com" ]
+      - [ "Me <me@example.com>", "me@example.com" ]
+      - [ "Foo <foo@example.com>", "foo@example.com" ]
+      - [ "WKD Test <test-wkd@example.org>", "test-wkd@example.org" ]
+
+    gpg_partial_emails:
+      - [ "doe@example.org", "Joe.Doe@Example.ORG" ]
+      - [ "oe@example.com", "joe.doe@Example.com" ]
+      - [ "me", "me@example.com" ]
+      - [ "foo@example.com", "foo@example.com" ]
+      - [ "wkd@example", "test-wkd@example.org" ]
+
+    gpg_fingerprints:
+      - [ "BF36C50FC30BFA3CE8229DB0A517A9DDE0F58D41", "Joe.Doe@Example.ORG" ]
+      - [ "07CA262BAB173B82E8EC1C09B5BE2BBA1925C0E4", "joe.doe@Example.com" ]
+      - [ "4939AC4FCF706B8124D4DA23B94C469E753E58B3", "me@example.com" ]
+      - [ "3E9D1C20E8EE0126FDBFD76B97D6191269B4D2B7", "foo@example.com" ]
+      - [ "F0C30AB5CDDD1D34AC45F8306BC9685D99DF9C95", "test-wkd@example.org" ]
+
   tasks:
     - name: Role znerol.gpg_export imported
       import_role:
@@ -31,3 +52,60 @@
       when: gpg_key_actual != gpg_key_expected
       fail:
         msg: "Unexpected gpg key for uid {{ gpg_uid }}"
+
+    - name: Test gpg_export (armor, exact_uid)
+      vars:
+        gpg_exact_uid: "{{ item[0] }}"
+        gpg_uid: "{{ item[1] }}"
+        fixture_kwds:
+          lstrip: False
+          rstrip: False
+        fixture_path: "{{ '{:s}/fixtures/{:s}.asc'.format(playbook_dir,  gpg_uid) }}"
+        gpg_key_expected: "{{ lookup('file', fixture_path, **fixture_kwds) }}"
+        export_kwds:
+          homedir: "{{ playbook_dir }}/fixtures/gnupg"
+          match: exact_uid
+          armor: True
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_exact_uid, **export_kwds) }}"
+      loop: "{{ gpg_exact_uids | list }}"
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected gpg key for exact_uid {{ gpg_exact_uid }}"
+
+    - name: Test gpg_export (armor, partial_email)
+      vars:
+        gpg_partial_email: "{{ item[0] }}"
+        gpg_uid: "{{ item[1] }}"
+        fixture_kwds:
+          lstrip: False
+          rstrip: False
+        fixture_path: "{{ '{:s}/fixtures/{:s}.asc'.format(playbook_dir,  gpg_uid) }}"
+        gpg_key_expected: "{{ lookup('file', fixture_path, **fixture_kwds) }}"
+        export_kwds:
+          homedir: "{{ playbook_dir }}/fixtures/gnupg"
+          match: partial_email
+          armor: True
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_partial_email, **export_kwds) }}"
+      loop: "{{ gpg_partial_emails | list }}"
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected gpg key for partial_email {{ gpg_partial_email }}"
+
+    - name: Test gpg_export (armor, fingerprint)
+      vars:
+        gpg_fingerprint: "{{ item[0] }}"
+        gpg_uid: "{{ item[1] }}"
+        fixture_kwds:
+          lstrip: False
+          rstrip: False
+        fixture_path: "{{ '{:s}/fixtures/{:s}.asc'.format(playbook_dir,  gpg_uid) }}"
+        gpg_key_expected: "{{ lookup('file', fixture_path, **fixture_kwds) }}"
+        export_kwds:
+          homedir: "{{ playbook_dir }}/fixtures/gnupg"
+          armor: True
+        gpg_key_actual: "{{ lookup('gpg_export', gpg_fingerprint, **export_kwds) }}"
+      loop: "{{ gpg_fingerprints | list }}"
+      when: gpg_key_actual != gpg_key_expected
+      fail:
+        msg: "Unexpected gpg key for fingerprint {{ gpg_fingerprint }}"
+
