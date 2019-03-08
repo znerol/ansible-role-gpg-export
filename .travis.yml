@@ -7,20 +7,43 @@ python:
   - "3.5"
   - "3.6"
 
+cache: pip
+
 env:
   - ANSIBLE_VERSION=latest
   - ANSIBLE_VERSION=2.7.*
   - ANSIBLE_VERSION=2.6.*
   - ANSIBLE_VERSION=2.5.*
 
+stages:
+  - lint
+  - test
+  - test-py3
+
 install:
   - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible; else pip install ansible==$ANSIBLE_VERSION; fi
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then pip install ansible-lint; fi
-
 script:
-  - if [ "$ANSIBLE_VERSION" = "latest" ]; then ansible-lint .; fi
   - ansible-playbook -i tests/inventory tests/test.yml --connection=local
-  - if python -c 'import sys; sys.exit(sys.version_info < (3,1))'; then ansible-playbook -i tests/inventory tests/test-py3.yml --connection=local; fi
+
+jobs:
+  include:
+    - stage: lint
+      python: "3.6"
+      env:
+        - ANSIBLE_VERSION=latest
+      install:
+        - pip install ansible-lint
+      script:
+        - ansible-lint .
+
+    - stage: test-py3
+      python: "3.6"
+      env:
+        - ANSIBLE_VERSION=latest
+      install:
+        - pip install ansible
+      script:
+        - ansible-playbook -i tests/inventory tests/test-py3.yml --connection=local
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
