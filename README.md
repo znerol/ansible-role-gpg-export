@@ -20,7 +20,7 @@ Optional Lookup Parameters
   GnuPG default (`~/.gnupg`).
 * `armor`: Produce ASCII armored output (see [man 1 gpg][2]). Defaults to `True`.
 * `export_options`: List of options for the exported keys (see [man 1 gpg][2]).
-* `match`: One of `default`, `exact\_uid`, `exact\_email`, `partial\_email`,
+* `match`: One of `default`, `exact_uid`, `exact_email`, `partial_email`,
   specifying how keys are matched to the given uids. (see [man 1 gpg][2])
 
 
