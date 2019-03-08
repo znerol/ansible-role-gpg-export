@@ -36,8 +36,7 @@ DOCUMENTATION = """
       match:
         description: >
             one of 'default', 'exact_uid', 'exact_email', 'partial_email',
-            'keygrip' specifying how keys are matched to the given uids. (see
-            man 1 gpg)
+            specifying how keys are matched to the given uids. (see man 1 gpg)
         type: string
         required: False
         default: default
@@ -133,8 +132,6 @@ class LookupModule(LookupBase):
             uidformat = '<{:s}>'
         elif matchmode == 'partial_email':
             uidformat = '@{:s}'
-        elif matchmode == 'keygrip':
-            uidformat = '&{:s}'
         else:
             raise AnsibleError("lookup_plugin.gpg_export(%s) invalid uid_match parameter %s" % (",".join(uids), matchmode))
 
